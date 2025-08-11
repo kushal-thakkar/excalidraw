@@ -49,7 +49,7 @@ import {
 } from "@excalidraw/excalidraw/components/icons";
 import { isElementLink } from "@excalidraw/element";
 import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
-import { newElementWith } from "@excalidraw/element";
+import { newElementWith, newTextElement } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
 import clsx from "clsx";
 import {
@@ -849,18 +849,54 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={editorTheme}
         renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
-            return null;
-          }
           return (
-            <div className="top-right-ui">
-              {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
-                isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
-              />
+            <div
+              className="top-right-ui"
+              style={{ display: "flex", gap: "8px", alignItems: "center" }}
+            >
+              <button
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#6965db",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                }}
+                onClick={() => {
+                  if (excalidrawAPI) {
+                    const textElement = newTextElement({
+                      x: 100,
+                      y: 100,
+                      text: "Hello Uber",
+                      fontSize: 36,
+                      strokeColor: "#000000",
+                    });
+
+                    const currentElements = excalidrawAPI.getSceneElements();
+                    excalidrawAPI.updateScene({
+                      elements: [...currentElements, textElement],
+                    });
+                  }
+                }}
+              >
+                Draw "Hello Uber"
+              </button>
+              {!isMobile && collabAPI && !isCollabDisabled && (
+                <>
+                  {collabError.message && (
+                    <CollabError collabError={collabError} />
+                  )}
+                  <LiveCollaborationTrigger
+                    isCollaborating={isCollaborating}
+                    onSelect={() =>
+                      setShareDialogState({ isOpen: true, type: "share" })
+                    }
+                  />
+                </>
+              )}
             </div>
           );
         }}
